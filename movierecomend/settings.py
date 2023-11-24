@@ -25,7 +25,14 @@ SECRET_KEY = 'django-insecure-sbn9!zgt%+b5zo$g5_s-rk5x$y0pelce-2l2e9@e7&#erz#^k4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+
+
+ALLOWED_HOSTS = [
+    # Other allowed hosts...
+    'movierecommendationsystem.sandeshsth.com.np',
+]
+
 
 
 # Application definition
