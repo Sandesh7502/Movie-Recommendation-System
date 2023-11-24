@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendations</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Movie Recommendation System</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Other navbar links here -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'recommend' %}">Recommend</a>
+                </li>
+                <!-- Logout option -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-power-off"></i> {{ user.username }}</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <h1 class="text-blue" style="font-size:50px">Recommend Movies</h1>
+                <form action="{% url 'recommend_movies' %}" method="post">
+                    {% csrf_token %}
+                    <div class="dropdown">
+                        <input type="text" name="movie_title" id="movie_title" placeholder="Enter a movie title" autocomplete="off" data-toggle="dropdown" style="width: 70%;">
+
+                        <div class="dropdown-menu" aria-labelledby="movie_title" id="movie_dropdown">
+                            <!-- Dropdown options will be dynamically added here -->
+                        </div>
+                    
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </span>
+                </div>
+                <br>
+                <input type="submit" class="btn btn-warning" value="Get Recommendations">
+            </form>
+        </div>
+    </div>
+    {% if recommended_movies %}
+    <h3 style="color: black; margin-top: 20px;">Recommended movies for "{{ searched_movie_title }}"</h3>
+    <div class="row">
+        {% for movie in recommended_movies %}
+            <div class="col-md-2 mb-4">
+                <div class="card">
+                    <img src="{{ movie.Poster }}" class="card-img-top img-fluid" alt="{{ movie.Title }} Poster">
+                    <div class="card-body">
+                        <h5 class="card-title" style="font-size: 16px;">{{ movie.Title }}</h5>
+                        <p class="card-text" style="font-size: 14px;">Genres: {{ movie.Genres }}</p>
+                        <p class="card-text" style="font-size: 14px;">Cosine Similarity Score: {{ movie.cosinesimilarity_score }}</p>
+                        <p class="card-text" style="font-size: 14px;">Cast: {{ movie.Cast }}</p>
+                    </div>
+                </div>
+            </div>
+            {% if forloop.counter|divisibleby:5 %}
+
+                </div><div class="row">
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+</div>
+    <!-- jQuery and AJAX script -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#movie_title').on('input', function() {
+        var input = $(this).val();
+        if (input.length >= 2) {
+            $.ajax({
+                url: '/get_movie_titles/',  // Replace with the actual URL for get_movie_titles function
+                method: 'GET',
+                data: {input: input},
+                success: function(response) {
+                    var dropdown = $('#movie_dropdown');
+                    dropdown.empty();
+                    if (response.length > 0) {
+                        for (var i = 0; i < response.length; i++) {
+                            dropdown.append('<a class="dropdown-item" href="#">' + response[i] + '</a>');
+                        }
+                        dropdown.show();
+                    } else {
+                        dropdown.hide();
+                    }
+                }
+            });
+        } else {
+            $('#movie_dropdown').hide();
+        }
+    });
+
+    // Hide the dropdown when the user clicks outside
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('#movie_dropdown').length && !$(event.target).closest('#movie_title').length) {
+            $('#movie_dropdown').hide();
+        }
+    });
+
+    // Set the selected movie title when the user clicks on a dropdown item
+    $(document).on('click', '#movie_dropdown a', function(event) {
+        event.preventDefault();
+        var movieTitle = $(this).text();
+        $('#movie_title').val(movieTitle);
+        $('#movie_dropdown').hide();
+    });
+});
+</script>
+</body>
+</html>
