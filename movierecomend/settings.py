@@ -33,6 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     # Other allowed hosts...
     'movierecommendationsystem.sandeshsth.com.np',
+    'movie-recommendation-system-7ad5.onrender.com',
 ]
 
 
